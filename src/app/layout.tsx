@@ -8,9 +8,8 @@ import { Footer } from "@/components/custom/Footer";
 
 const inter = Inter({ subsets: ["latin"] });
 
-export async function generateMetaData(): Promise<Metadata> {
+export async function generateMetadata(): Promise<Metadata> {
   const metadata = await getGlobalPageMetadata();
-
   return {
     title: metadata?.title,
     description: metadata?.description,
@@ -23,6 +22,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const globalData = await getGlobalPageData();
+  console.log(globalData);
   return (
     <html lang="en">
       <body className={inter.className}>
