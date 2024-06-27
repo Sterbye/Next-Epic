@@ -1,4 +1,4 @@
-import { unstable_noStore as noStore } from "next/cache";
+// import { unstable_noStore as noStore } from "next/cache";
 import qs from "qs";
 import { flattenAttributes, getStrapiURL } from "@/lib/utils";
 
@@ -47,7 +47,7 @@ export async function getHomePageData() {
 }
 
 export async function getGlobalPageData() {
-  noStore();
+  // noStore();
 
   const url = new URL("/api/global", baseUrl);
 
