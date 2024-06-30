@@ -1,11 +1,13 @@
-// import { unstable_noStore as noStore } from "next/cache";
 import qs from "qs";
+import { getAuthToken } from "./services/get-token";
+
 import { flattenAttributes, getStrapiURL } from "@/lib/utils";
 
 const baseUrl = getStrapiURL();
 
 async function fetchData(url: string) {
-  const authToken = null; // we will implement this later getAuthToken() later
+  const authToken = await getAuthToken();
+
   const headers = {
     method: "GET",
     headers: {
@@ -26,6 +28,7 @@ async function fetchData(url: string) {
 
 export async function getHomePageData() {
   const url = new URL("/api/home-page", baseUrl);
+
   url.search = qs.stringify({
     populate: {
       blocks: {
@@ -43,12 +46,11 @@ export async function getHomePageData() {
       },
     },
   });
+
   return await fetchData(url.href);
 }
 
 export async function getGlobalPageData() {
-  // noStore();
-
   const url = new URL("/api/global", baseUrl);
 
   url.search = qs.stringify({
@@ -71,4 +73,13 @@ export async function getGlobalPageMetadata() {
   });
 
   return await fetchData(url.href);
+}
+
+export async function getSummaries() {
+  const url = new URL("/api/summaries", baseUrl);
+  return fetchData(url.href);
+}
+
+export async function getSummaryById(summaryId: string) {
+  return fetchData(`${baseUrl}/api/summaries/${summaryId}`);
 }

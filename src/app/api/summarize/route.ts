@@ -24,7 +24,7 @@ function transformData(data: any[]) {
 const TEMPLATE = `
 INSTRUCTIONS: 
   For the this {text} complete the following steps.
-  Generate the title for based on the content provided
+  Generate the title based on the content provided
   Summarize the following content and include 5 key topics, writing in first person using normal tone of voice.
   
   Write a youtube video description
@@ -66,6 +66,8 @@ async function generateSummary(content: string, template: string) {
 }
 
 export async function POST(req: NextRequest) {
+  console.log("FROM OUR ROUTE HANDLER:", req.body);
+
   const user = await getUserMeLoader();
   const token = await getAuthToken();
 
@@ -84,33 +86,26 @@ export async function POST(req: NextRequest) {
       { status: 402 }
     );
 
-  console.log("FROM OUR ROUTE HANDLER:", req.body);
   const body = await req.json();
-  const videoId = body.videoId;
+  const { videoId } = body;
 
   let transcript: Awaited<ReturnType<typeof fetchTranscript>>;
 
   try {
     transcript = await fetchTranscript(videoId);
-  } catch (error) {
-    console.error("Error processing request:", error);
-    if (error instanceof Error)
-      return new Response(JSON.stringify({ error: error.message }));
-    return new Response(JSON.stringify({ error: "Error getting transcript." }));
-  }
 
-  const transformedData = transformData(transcript);
-  console.log("Transformed Data", transformedData.text);
+    const transformedData = transformData(transcript);
+    console.log("Transcript:", transformedData.text);
 
-  let summary: Awaited<ReturnType<typeof generateSummary>>;
+    let summary: Awaited<ReturnType<typeof generateSummary>>;
 
-  try {
     summary = await generateSummary(transformedData.text, TEMPLATE);
+    console.log("Summary:", summary);
     return new Response(JSON.stringify({ data: summary, error: null }));
   } catch (error) {
     console.error("Error processing request:", error);
     if (error instanceof Error)
-      return new Response(JSON.stringify({ error: error.message }));
-    return new Response(JSON.stringify({ error: "Error generating summary." }));
+      return new Response(JSON.stringify({ error: error }));
+    return new Response(JSON.stringify({ error: "Unknown error" }));
   }
 }
